@@ -5,6 +5,8 @@ const Temperatura = {
     registrarTemperatura: function(temperatura) {
         temperaturasRegistradas.push(temperatura);
         this.analizarTemperatura(temperatura);
+        this.actualizarLocalStorage();
+        this.mostrarTemperaturas();
     },
     analizarTemperatura: function(temperatura) {
         if (temperatura <= 15) {
@@ -16,46 +18,64 @@ const Temperatura = {
         }
     },
     mostrarTemperaturas: function() {
-        alert("Temperaturas registradas: " + temperaturasRegistradas.join(', '));
+        const temperaturasDiv = document.getElementById('temperaturas');
+        temperaturasDiv.innerHTML = "Temperaturas registradas: " + temperaturasRegistradas.join(', ');
+
         let suma = temperaturasRegistradas.reduce((total, temp) => total + temp, 0);
         let promedio = suma / temperaturasRegistradas.length;
-        alert("La temperatura promedio es: " + promedio.toFixed(2));
+
+        const promedioDiv = document.getElementById('promedio');
+        promedioDiv.innerHTML = "La temperatura promedio es: " + promedio.toFixed(2);
     },
-    buscarTemperatura: function() {
-        let temperaturaBuscar = Number(prompt("Ingrese la temperatura que desea buscar: "));
+    buscarTemperatura: function(temperaturaBuscar) {
         if (temperaturasRegistradas.includes(temperaturaBuscar)) {
-            alert("La temperatura está en la lista.");
+            console.log("La temperatura está en la lista.");
         } else {
-            alert("La temperatura no está en la lista.");
+            console.log("La temperatura no está en la lista.");
         }
     },
-    filtrarTemperaturas: function() {
-        let rangoMin = Number(prompt("Ingrese el límite mínimo del rango: "));
-        let rangoMax = Number(prompt("Ingrese el límite máximo del rango: "));
+    filtrarTemperaturas: function(rangoMin, rangoMax) {
         let temperaturasFiltradas = temperaturasRegistradas.filter(temp => temp >= rangoMin && temp <= rangoMax);
-        alert("Temperaturas dentro del rango: " + temperaturasFiltradas.join(', '));
+        console.log("Temperaturas dentro del rango: " + temperaturasFiltradas.join(', '));
     },
     frio: function() {
-        alert("Hace frío, ve a cerrar las ventanas y prender la estufa.");
+        console.log("Hace frío, ve a cerrar las ventanas y prender la estufa.");
     },
     templado: function() {
-        alert("Está templado, procura usar ropa cómoda y ventilar la casa.");
+        console.log("Está templado, procura usar ropa cómoda y ventilar la casa.");
     },
     calor: function() {
-        alert("Hace calor, deberías usar ropa ligera y prender ventiladores/aires acondicionados del hogar.");
+        console.log("Hace calor, deberías usar ropa ligera y prender ventiladores/aires acondicionados del hogar.");
+    },
+    actualizarLocalStorage: function() {
+        localStorage.setItem('temperaturas', JSON.stringify(temperaturasRegistradas));
     }
 };
 
-while (continuar) {
-    let temperatura = Number(prompt("Ingrese la temperatura de su zona."));
+document.getElementById('formulario').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const temperaturaInput = document.getElementById('temperaturaInput');
+    const temperatura = parseFloat(temperaturaInput.value);
     Temperatura.registrarTemperatura(temperatura);
+    temperaturaInput.value = '';
+});
 
-    let respuesta = prompt("¿Desea ingresar otra temperatura? (Sí/No)").toLowerCase();
-    if (respuesta !== "sí" && respuesta !== "si") {
-        continuar = false;
+document.getElementById('buscarBtn').addEventListener('click', function() {
+    const temperaturaBuscar = parseFloat(document.getElementById('buscarInput').value);
+    Temperatura.buscarTemperatura(temperaturaBuscar);
+});
+
+document.getElementById('filtrarBtn').addEventListener('click', function() {
+    const rangoMin = parseFloat(document.getElementById('rangoMin').value);
+    const rangoMax = parseFloat(document.getElementById('rangoMax').value);
+    Temperatura.filtrarTemperaturas(rangoMin, rangoMax);
+});
+
+// Cargar temperaturas desde localStorage al cargar la página
+window.addEventListener('load', function() {
+    const temperaturasGuardadas = JSON.parse(localStorage.getItem('temperaturas'));
+    if (temperaturasGuardadas) {
+        temperaturasRegistradas = temperaturasGuardadas;
+        Temperatura.mostrarTemperaturas();
     }
-}
-
-Temperatura.mostrarTemperaturas();
-Temperatura.buscarTemperatura();
-Temperatura.filtrarTemperaturas();
+});
