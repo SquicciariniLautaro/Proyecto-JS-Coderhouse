@@ -67,7 +67,6 @@ let temperaturasRegistradas = [];
         Temperatura.filtrarTemperaturas(rangoMin, rangoMax);
     });
 
-    // Cargar temperaturas desde localStorage al cargar la página
     window.addEventListener('load', function() {
         const temperaturasGuardadas = JSON.parse(localStorage.getItem('temperaturas'));
         if (temperaturasGuardadas) {
